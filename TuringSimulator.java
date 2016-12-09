@@ -1,17 +1,30 @@
+//A java program to that reads in a Turing Machine Descriptor File (TMDF) and executes input strings
+//on that machine.
+//By: Matt Schnider
+//Fall 2016 - CSC340
+//Dr. Allen
 import java.io.*;
 import java.util.*;
 public class TuringSimulator
 {
-	public static int state;
+	private static int state;		//Global variable to hold the current state.
 
 	public static void main(String [] args) throws IOException
 	{
-		ArrayList<Transition> tArray = new ArrayList<Transition>();
-		selectFile(tArray);
+		ArrayList<Transition> tArray = new ArrayList<Transition>(); 		//ArrayList of transitions to hold the delta funtion of the Turing Machine.
+		selectFile(tArray);							
 		menuSelect(tArray);
 		
      		
 	}
+	//Method to retrieve the index in the ArrayList tArray that corresponds to the current state and tape character.
+	//ArrayList tArray is passed in along with the current character on the tape and the current state. A local variable
+	//indexOf is set to -1 as a not found flag. A for loop parses tArray. An if statement checks to see if the current
+	//tape character is equal to current tape character of the transition in slot i. If it is and the current state in the 
+	//transition matches the current state, the appropriate transition has been found and indexOf is updated to reflect that.
+	//indexOf is then passed back to the calling function.
+	//PRECONDITION: tArray, currChar, currState passed in.
+	//POSTCONDITION: int index of the appropriate trasition is passed back.
 	private static int indexOfTransition(ArrayList<Transition> tArray, char currChar, int currState)
 	{
 		int indexOf = -1;
@@ -28,6 +41,19 @@ public class TuringSimulator
           return indexOf;
 		
 	}
+	//Method to simulate the running of the selected Turing machine. Clearscreen method is called to wipe the screen of any text.
+	//A series of print statements print out the Simulation header. A scanner is initialiezed to read input from the keyboard and
+	//the user is prompted to enter an input string. The string object, input, captures the incoming string and is then used to create
+	//a StringBuffer object to allow for easier parsing and character manipulation. The character B is appended to the end of the 
+	//tapeSim StringBuffer to denote blank space at the end of the input string. Local variables are used to simulate parts of the 
+	//machine. rHead is the read head and it is initialized 0 to point to the first character on the input tape. currState is set to 0
+	//to set up the machine in the start state q0. CharChar is set to hold the current character that the read head is pointing to in tapeSim.
+	//A while loop is then set up to keep the machine running until the end of the tapeSim is reached. The indexOfTransition method retrieves 
+	//the index of the current transition in tArray. If this value is less than 0, indicating the at the flag val of -1 was returned, a message
+	//prints alerting the user of bad input/state not found and the loop terminates. The Tape is then updated to reflect the character rules
+	//of the transition and is then printed out to show the result. A series of if esle if statements then evaluate if the head needs to move
+	//L or Right and updates rHead accordingly. At the end of the loop, if the currState is equal to n-states-2, the input accepts, else it rejects.
+	//The user is then offered the choice of selecting a for another simulation or enter for the main menu.
         private static void runSimulation(ArrayList<Transition> tArray)
 	{
 		clearScreen();
@@ -44,7 +70,6 @@ public class TuringSimulator
 		tapeSim.append('B');
 		int rHead = 0;
 		int currState = 0;
-		int count = 0;
 		char currChar = tapeSim.charAt(rHead);
 		
 		while(rHead < tapeSim.length())
@@ -88,10 +113,14 @@ public class TuringSimulator
 
 		
 	}
+	//Method to clear the screen
 	private static void clearScreen()
 	{		
 		System.out.println("\u001b[H\u001b[2J");
      	}
+	//Method to read in menu selections passed in from the printMenu method. A scanner object is set up to read input from the keyboard.
+	//A switch statement then takes the String passed back from printMenu to select the appropriate case. If an invalid input is entered
+	//the user is notified and asked to try again. menuSelect is called at the end of each case to keep the program going until the user quits.
 	private static void menuSelect(ArrayList<Transition> tArray) throws IOException
 	{ Scanner in = new Scanner(System.in);
 		switch(printMenu())
@@ -116,6 +145,8 @@ public class TuringSimulator
 		}
 
 	}
+	//Method to print out the main menu. Series of print statements display the text menu. A scanner is set up to read keyboard input and
+	//and the selection is passed back to the calling function.
 	private static String printMenu()
 	{
 		clearScreen();
@@ -133,6 +164,11 @@ public class TuringSimulator
 		selection = selection.toLowerCase();
 	  return selection;
 	}
+	//Method to display a list of TMDF (.tm) files in the current directory and read in the selected filename. String inFile is declared.
+	//clearScreen is called to wipe the screen. A series of print statements then print out header and a method call to getFiles() displays
+	//the current .tm files in the directory. The user is then prompted for a filename and the scanner is then reconfigured to read in data from the
+	//inputted filename. A while loop the parses the .tm file and builds the arrayList of transitions. After this has been completed, the information
+	//about the imported Turing machine is displayed.
 	private static ArrayList<Transition> selectFile(ArrayList<Transition> tArray) throws IOException
 	{	
 		String inFile;
@@ -192,6 +228,7 @@ public class TuringSimulator
 		in.nextLine();
 	  return tArray;
 	}
+	//getFiles builds an array of strings that end in .tm in the current directory
 	private static void getFiles()
 	{
 		
